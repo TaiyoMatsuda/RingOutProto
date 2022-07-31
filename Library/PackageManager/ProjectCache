@@ -5,16 +5,16 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 637947924236433405
-    m_Hash: 2684048678
+      ticks: 637948291378354918
+    m_Hash: 3552091361
   m_LockFileStatus:
     m_FilePath: C:/dvlp/Unity/RingOutProto/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 637947924236553088
-    m_Hash: 2572081060
+      ticks: 637948291378371930
+    m_Hash: 3837269729
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
