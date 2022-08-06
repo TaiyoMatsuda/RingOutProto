@@ -9,12 +9,9 @@ using UnityEngine.InputSystem;
 namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-    [RequireComponent(typeof(PlayerInput))]
-#endif
     public class EnemyController : MonoBehaviour
     {
-        [Header("Player")]
+        [Header("Enemy")]
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 10.0f;
 
@@ -33,7 +30,7 @@ namespace StarterAssets
         [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
         [Space(10)]
-        [Tooltip("The height the player can jump")]
+        [Tooltip("The height the enemy can jump")]
         public float JumpHeight = 1.2f;
 
         [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
@@ -46,7 +43,7 @@ namespace StarterAssets
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
 
-        [Header("Player Grounded")]
+        [Header("Enemy Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
         public bool Grounded = true;
 
@@ -71,15 +68,10 @@ namespace StarterAssets
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
 
-        // cinemachine
-        private float _cinemachineTargetYaw;
-        private float _cinemachineTargetPitch;
-
-        // player
+        // enemy
         private float _speed;
         private float _animationBlend;
         private float _targetRotation = 0.0f;
-        private float _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
 
@@ -123,6 +115,7 @@ namespace StarterAssets
             GroundedCheck();
             Move();
             //Attack();
+            Damage();
         }
 
         private void LateUpdate()
@@ -168,7 +161,7 @@ namespace StarterAssets
             // if there is no input, set the target speed to 0
             //if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
-            // a reference to the players current horizontal velocity
+            // a reference to the enemys current horizontal velocity
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
             float speedOffset = 0.1f;
@@ -198,7 +191,7 @@ namespace StarterAssets
             //Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
             // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is a move input rotate player when the player is moving
+            // if there is a move input rotate enemy when the enemy is moving
             //if (_input.move != Vector2.zero)
             //{
             //    _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
@@ -213,7 +206,7 @@ namespace StarterAssets
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
-            // move the player
+            // move the enemy
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
                              new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
@@ -351,38 +344,15 @@ namespace StarterAssets
             }
         }
 
-        private void OnTriggerEnter(Collider other)
+        public float _damage = 0;
+        public Vector3 _damageVec;
+        private void Damage()
         {
-            //if (_earthTag == _collider.tag)
-            //{
-            //    return;
-            //}
-            ////自分の体は除外
-            //if (_player && _player == _collider.gameObject)
-            //{
-            //    return;
-            //}
-
-            ////攻撃状態じゃなかったら何もしない
-            //PlayerCtrl player = _player.GetComponent<PlayerCtrl>();
-            //if (PlayerCtrl.STATE_PLAYER.PANCH != player.GetAnimState())
-            //{
-
-            //    //ぶつかった相手からRigitBodyを取り出す
-            //    Rigidbody otherRigitbody = _collider.GetComponent<Rigidbody>();
-            //    if (!otherRigitbody)
-            //    {
-            //        return;
-            //    }
-
-            //    //吹き飛ばす方向を求める(プレイヤーから触れたものの方向)
-            //    Vector3 toVec = GetAngleVec(_player, _collider.gameObject);
-
-            //    //Y方向を足す
-            //    toVec = toVec + new Vector3(0, _forceHeight, 0);
-
-            //    //ふきとべええ
-            //    otherRigitbody.AddForce(toVec * _forcePower, ForceMode.Impulse);
+            if (_damage > 0)
+            {
+                _controller.Move(_damageVec * _damage * Time.deltaTime);
+                _damage = _damage - 1;
+            }
         }
     }
 }
