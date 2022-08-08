@@ -95,6 +95,41 @@ namespace StarterAssets
 
         private bool _hasAnimator;
 
+
+        public enum EnemyState
+        {
+            Walk,
+            Wait,
+            Chase
+        };
+
+        private Animator animator;
+        //　目的地
+        private Vector3 _destination;
+        //　歩くスピード
+        [SerializeField]
+        private float walkSpeed = 1.0f;
+        //　速度
+        private Vector3 velocity;
+        //　移動方向
+        private Vector3 direction;
+        //　到着フラグ
+        private bool arrived;
+        //　SetPositionスクリプト
+        private SetPosition setPosition;
+        //　待ち時間
+        [SerializeField]
+        private float waitTime = 5f;
+        //　経過時間
+        private float elapsedTime;
+        // 敵の状態
+        private EnemyState state;
+        //　プレイヤーTransform
+        private Transform playerTransform;
+
+
+        private Vector3 startPosition;
+
         private void Start()
         {
             _hasAnimator = TryGetComponent(out _animator);
@@ -105,6 +140,26 @@ namespace StarterAssets
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+
+
+
+            animator = GetComponent<Animator>();
+            CreateRandomPosition();
+            velocity = Vector3.zero;
+            arrived = false;
+            elapsedTime = 0f;
+            SetState(EnemyState.Walk);
+
+            startPosition = transform.position;
+            _destination = transform.position;
+        }
+
+        public void CreateRandomPosition()
+        {
+            //　ランダムなVector2の値を得る
+            var randDestination = Random.insideUnitCircle * 8;
+            //　現在地にランダムな位置を足して目的地とする
+            _destination = startPosition + new Vector3(randDestination.x, 0, randDestination.y);
         }
 
         private void Update()
@@ -151,71 +206,54 @@ namespace StarterAssets
 
         private void Move()
         {
-            // set target speed based on move speed, sprint speed and if sprint is pressed
-            //float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-            float targetSpeed = MoveSpeed;
-
-            // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
-            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is no input, set the target speed to 0
-            //if (_input.move == Vector2.zero) targetSpeed = 0.0f;
-
-            // a reference to the enemys current horizontal velocity
-            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
-            float speedOffset = 0.1f;
-            //float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
-
-            // accelerate or decelerate to target speed
-            if (currentHorizontalSpeed < targetSpeed - speedOffset ||
-                currentHorizontalSpeed > targetSpeed + speedOffset)
+            switch (state)
             {
-                // creates curved result rather than a linear one giving a more organic speed change
-                // note T in Lerp is clamped, so we don't need to clamp our speed
-                //_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                //    Time.deltaTime * SpeedChangeRate);
+                case EnemyState.Wait:
+                    
+                    elapsedTime += Time.deltaTime;
+                    if (elapsedTime > waitTime)
+                    {
+                        SetState(EnemyState.Walk);
+                    }
+                    break;
 
-                // round speed to 3 decimal places
-                _speed = Mathf.Round(_speed * 1000f) / 1000f;
+                case EnemyState.Walk:
+                    if (_controller.isGrounded)
+                    {
+                        velocity = Vector3.zero;
+                        animator.SetFloat("Speed", 2.0f);
+                        direction = (_destination - transform.position).normalized;
+                        transform.LookAt(new Vector3(_destination.x, transform.position.y, _destination.z));
+                        velocity = direction * walkSpeed;
+                    }
+
+                    if (Vector3.Distance(transform.position, _destination) < 2.0f)
+                    {
+                        SetState(EnemyState.Wait);
+                        animator.SetFloat("Speed", 0.0f);
+                    }
+                    break;
+                case EnemyState.Chase:
+                    _destination = playerTransform.position;
+                    if (_controller.isGrounded)
+                    {
+                        velocity = Vector3.zero;
+                        animator.SetFloat("Speed", 2.0f);
+                        direction = (_destination - transform.position).normalized;
+                        transform.LookAt(new Vector3(_destination.x, transform.position.y, _destination.z));
+                        velocity = direction * walkSpeed;
+                    }
+
+                    if (Vector3.Distance(transform.position, _destination) < 0.5f)
+                    {
+                        SetState(EnemyState.Wait);
+                        animator.SetFloat("Speed", 0.0f);
+                    }
+                    break;
             }
-            else
-            {
-                _speed = targetSpeed;
-            }
-
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-            if (_animationBlend < 0.01f) _animationBlend = 0f;
-
-            // normalise input direction
-            //Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-
-            // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is a move input rotate enemy when the enemy is moving
-            //if (_input.move != Vector2.zero)
-            //{
-            //    _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
-            //                      _mainCamera.transform.eulerAngles.y;
-            //    float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-            //        RotationSmoothTime);
-
-            //    // rotate to face input direction relative to camera position
-            //    transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-            //}
-
-
-            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-
-            // move the enemy
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-
-            // update animator if using character
-            if (_hasAnimator)
-            {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
-                //_animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
-            }
+            
+            velocity.y += Physics.gravity.y * Time.deltaTime;
+            _controller.Move(velocity * Time.deltaTime);
         }
 
         private void JumpAndGravity()
@@ -353,6 +391,38 @@ namespace StarterAssets
                 _controller.Move(_damageVec * _damage * Time.deltaTime);
                 _damage = _damage - 1;
             }
+        }
+
+        public void SetState(EnemyState tempState, Transform targetObj = null)
+        {
+            if (tempState == EnemyState.Walk)
+            {
+                arrived = false;
+                elapsedTime = 0f;
+                state = tempState;
+                CreateRandomPosition();
+            }
+            else if (tempState == EnemyState.Chase)
+            {
+                state = tempState;
+                //　待機状態から追いかける場合もあるのでOff
+                arrived = false;
+                //　追いかける対象をセット
+                playerTransform = targetObj;
+            }
+            else if (tempState == EnemyState.Wait)
+            {
+                elapsedTime = 0f;
+                state = tempState;
+                arrived = true;
+                velocity = Vector3.zero;
+                animator.SetFloat("Speed", 0f);
+            }
+        }
+
+        public EnemyState GetState()
+        {
+            return state;
         }
     }
 }
