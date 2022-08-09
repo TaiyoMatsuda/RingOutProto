@@ -103,7 +103,6 @@ namespace StarterAssets
             Chase
         };
 
-        private Animator animator;
         //　目的地
         private Vector3 _destination;
         //　歩くスピード
@@ -141,9 +140,6 @@ namespace StarterAssets
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
 
-
-
-            animator = GetComponent<Animator>();
             CreateRandomPosition();
             velocity = Vector3.zero;
             arrived = false;
@@ -221,7 +217,7 @@ namespace StarterAssets
                     if (_controller.isGrounded)
                     {
                         velocity = Vector3.zero;
-                        animator.SetFloat("Speed", 2.0f);
+                        _animator.SetFloat("Speed", 2.0f);
                         direction = (_destination - transform.position).normalized;
                         transform.LookAt(new Vector3(_destination.x, transform.position.y, _destination.z));
                         velocity = direction * walkSpeed;
@@ -230,7 +226,7 @@ namespace StarterAssets
                     if (Vector3.Distance(transform.position, _destination) < 2.0f)
                     {
                         SetState(EnemyState.Wait);
-                        animator.SetFloat("Speed", 0.0f);
+                        _animator.SetFloat("Speed", 0.0f);
                     }
                     break;
                 case EnemyState.Chase:
@@ -238,7 +234,7 @@ namespace StarterAssets
                     if (_controller.isGrounded)
                     {
                         velocity = Vector3.zero;
-                        animator.SetFloat("Speed", 2.0f);
+                        _animator.SetFloat("Speed", 2.0f);
                         direction = (_destination - transform.position).normalized;
                         transform.LookAt(new Vector3(_destination.x, transform.position.y, _destination.z));
                         velocity = direction * walkSpeed;
@@ -247,7 +243,7 @@ namespace StarterAssets
                     if (Vector3.Distance(transform.position, _destination) < 0.5f)
                     {
                         SetState(EnemyState.Wait);
-                        animator.SetFloat("Speed", 0.0f);
+                        _animator.SetFloat("Speed", 0.0f);
                     }
                     break;
             }
@@ -416,7 +412,7 @@ namespace StarterAssets
                 state = tempState;
                 arrived = true;
                 velocity = Vector3.zero;
-                animator.SetFloat("Speed", 0f);
+                _animator.SetFloat("Speed", 0f);
             }
         }
 
