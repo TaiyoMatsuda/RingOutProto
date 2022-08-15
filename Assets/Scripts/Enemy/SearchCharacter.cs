@@ -5,11 +5,11 @@ using StarterAssets;
 public class SearchCharacter : MonoBehaviour
 {
 
-    private EnemyController moveEnemy;
+    private EnemyController _controller;
 
     void Start()
     {
-        moveEnemy = GetComponentInParent<EnemyController>();
+        _controller = GetComponentInParent<EnemyController>();
     }
 
     void OnTriggerStay(Collider col)
@@ -18,12 +18,12 @@ public class SearchCharacter : MonoBehaviour
         if (col.tag == "Player")
         {
             //　敵キャラクターの状態を取得
-            EnemyController.EnemyState state = moveEnemy.GetState();
+            EnemyController.EnemyState state = _controller.GetState();
             //　敵キャラクターが追いかける状態でなければ追いかける設定に変更
             if (state != EnemyController.EnemyState.Chase)
             {
                 Debug.Log("プレイヤー発見");
-                moveEnemy.SetState(EnemyController.EnemyState.Chase, col.transform);
+                _controller.SetState(EnemyController.EnemyState.Chase, col.transform);
             }
         }
     }
@@ -33,7 +33,7 @@ public class SearchCharacter : MonoBehaviour
         if (col.tag == "Player")
         {
             Debug.Log("見失う");
-            moveEnemy.SetState(EnemyController.EnemyState.Wait);
+            _controller.SetState(EnemyController.EnemyState.Wait);
         }
     }
 }

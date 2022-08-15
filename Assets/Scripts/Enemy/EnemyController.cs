@@ -71,7 +71,6 @@ namespace StarterAssets
         // enemy
         private float _speed;
         private float _animationBlend;
-        private float _targetRotation = 0.0f;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
 
@@ -105,15 +104,10 @@ namespace StarterAssets
 
         //　目的地
         private Vector3 _destination;
-        //　歩くスピード
-        [SerializeField]
-        private float walkSpeed = 1.0f;
         //　速度
         private Vector3 velocity;
         //　移動方向
         private Vector3 direction;
-        //　到着フラグ
-        private bool arrived;
         //　SetPositionスクリプト
         private SetPosition setPosition;
         //　待ち時間
@@ -142,7 +136,6 @@ namespace StarterAssets
 
             CreateRandomPosition();
             velocity = Vector3.zero;
-            arrived = false;
             elapsedTime = 0f;
             SetState(EnemyState.Walk);
 
@@ -202,6 +195,18 @@ namespace StarterAssets
 
         private void Move()
         {
+            float targetSpeed = false ? SprintSpeed : MoveSpeed;
+            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+            _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * 1f,
+                    Time.deltaTime * SpeedChangeRate);
+            _speed = Mathf.Round(_speed * 1000f) / 1000f;
+
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
+            if (_animationBlend < 0.01f)
+            {
+                _animationBlend = 0f;
+            }
+
             switch (state)
             {
                 case EnemyState.Wait:
@@ -214,36 +219,47 @@ namespace StarterAssets
                     break;
 
                 case EnemyState.Walk:
+
                     if (_controller.isGrounded)
                     {
-                        velocity = Vector3.zero;
-                        _animator.SetFloat("Speed", 2.0f);
                         direction = (_destination - transform.position).normalized;
                         transform.LookAt(new Vector3(_destination.x, transform.position.y, _destination.z));
-                        velocity = direction * walkSpeed;
+                        velocity = direction * targetSpeed;
+                    }
+
+                    if (_hasAnimator)
+                    {
+                        _animator.SetFloat(_animIDSpeed, _animationBlend);
+                        _animator.SetFloat(_animIDMotionSpeed, 1f);
                     }
 
                     if (Vector3.Distance(transform.position, _destination) < 2.0f)
                     {
                         SetState(EnemyState.Wait);
-                        _animator.SetFloat("Speed", 0.0f);
+                        _animator.SetFloat(_animIDSpeed, 0.0f);
                     }
                     break;
+
                 case EnemyState.Chase:
+
                     _destination = playerTransform.position;
                     if (_controller.isGrounded)
                     {
-                        velocity = Vector3.zero;
-                        _animator.SetFloat("Speed", 2.0f);
                         direction = (_destination - transform.position).normalized;
                         transform.LookAt(new Vector3(_destination.x, transform.position.y, _destination.z));
-                        velocity = direction * walkSpeed;
+                        velocity = direction * targetSpeed;
                     }
 
-                    if (Vector3.Distance(transform.position, _destination) < 0.5f)
+                    if (_hasAnimator)
+                    {
+                        _animator.SetFloat(_animIDSpeed, _animationBlend);
+                        _animator.SetFloat(_animIDMotionSpeed, 1f);
+                    }
+
+                    if (Vector3.Distance(transform.position, _destination) < 1.0f)
                     {
                         SetState(EnemyState.Wait);
-                        _animator.SetFloat("Speed", 0.0f);
+                        _animator.SetFloat(_animIDSpeed, 0.0f);
                     }
                     break;
             }
@@ -393,7 +409,6 @@ namespace StarterAssets
         {
             if (tempState == EnemyState.Walk)
             {
-                arrived = false;
                 elapsedTime = 0f;
                 state = tempState;
                 CreateRandomPosition();
@@ -401,8 +416,6 @@ namespace StarterAssets
             else if (tempState == EnemyState.Chase)
             {
                 state = tempState;
-                //　待機状態から追いかける場合もあるのでOff
-                arrived = false;
                 //　追いかける対象をセット
                 playerTransform = targetObj;
             }
@@ -410,7 +423,6 @@ namespace StarterAssets
             {
                 elapsedTime = 0f;
                 state = tempState;
-                arrived = true;
                 velocity = Vector3.zero;
                 _animator.SetFloat("Speed", 0f);
             }
