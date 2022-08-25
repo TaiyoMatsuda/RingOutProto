@@ -14,6 +14,7 @@ namespace StarterAssets
 		public bool sprint;
 		public bool leftPunch;
 		public bool rightPunch;
+		public bool block;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -55,6 +56,11 @@ namespace StarterAssets
 		{
 			RightPunchInput(value.isPressed);
 		}
+
+		public void OnBlock(InputValue value)
+        {
+			BlockInput(value.isPressed);
+        }
 #endif
 
 
@@ -87,6 +93,11 @@ namespace StarterAssets
 		{
 			leftPunch = newLeftPunchState;
 		}
+
+		public void BlockInput(bool newBlockState)
+        {
+			block = newBlockState;
+        }
 
 		private void OnApplicationFocus(bool hasFocus)
 		{

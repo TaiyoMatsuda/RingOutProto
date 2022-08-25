@@ -2,6 +2,7 @@ using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static StarterAssets.EnemyController;
 
 public class AttackForce : MonoBehaviour
 {
@@ -36,13 +37,27 @@ public class AttackForce : MonoBehaviour
         Animator animator = _me.GetComponent<Animator>();
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("LeftPunch"))
         {
-            enemyController._damage = 50;
+            if (enemyController.GetState() == EnemyState.Block)
+            {
+                enemyController._damage = 5;
+            }
+            else
+            {
+                enemyController._damage = 50;
+            }
             enemyController._damageVec = toVec;
         }
 
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("RightPunch"))
         {
-            enemyController._damage = 100;
+            if (enemyController.GetState() == EnemyState.Block)
+            {
+                enemyController._damage = 10;
+            }
+            else
+            {
+                enemyController._damage = 100;
+            }
             enemyController._damageVec = toVec;
         }
     }
