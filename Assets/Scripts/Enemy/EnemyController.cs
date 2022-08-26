@@ -86,6 +86,7 @@ namespace StarterAssets
         private int _animIDMotionSpeed;
         private int _animIDLeftPunch;
         private int _animIDBoxing;
+        private int _animIDBlock;
 
         private Animator _animator;
         private CharacterController _controller;
@@ -99,7 +100,8 @@ namespace StarterAssets
         {
             Walk,
             Wait,
-            Chase
+            Chase,
+            Block
         };
 
         //　目的地
@@ -113,10 +115,11 @@ namespace StarterAssets
         //　待ち時間
         [SerializeField]
         private float waitTime = 5f;
-        //　経過時間
-        private float elapsedTime;
-        // 敵の状態
-        private EnemyState state;
+
+        private float _elapsedTime;
+        private EnemyState _state;
+        public bool _isBlockRest = false;
+        private float _blockRestTime = 5f;
         //　プレイヤーTransform
         private Transform playerTransform;
 
@@ -136,7 +139,7 @@ namespace StarterAssets
 
             CreateRandomPosition();
             velocity = Vector3.zero;
-            elapsedTime = 0f;
+            _elapsedTime = 0f;
             SetState(EnemyState.Walk);
 
             startPosition = transform.position;
@@ -155,10 +158,20 @@ namespace StarterAssets
         {
             _hasAnimator = TryGetComponent(out _animator);
 
+            //if (_isBlockRest)
+            //{
+            //    _elapsedTime += Time.deltaTime;
+            //    if (_elapsedTime <= _blockRestTime)
+            //    {
+            //        return;
+            //    }
+            //    _isBlockRest = false;
+            //}
+
             JumpAndGravity();
             GroundedCheck();
             Move();
-            //Attack();
+            Attack();
             Damage();
         }
 
@@ -176,6 +189,7 @@ namespace StarterAssets
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
             _animIDLeftPunch = Animator.StringToHash("LeftPunch");
             _animIDBoxing = Animator.StringToHash("RightPunch");
+            _animIDBlock = Animator.StringToHash("Block");
         }
 
         private void GroundedCheck()
@@ -207,12 +221,12 @@ namespace StarterAssets
                 _animationBlend = 0f;
             }
 
-            switch (state)
+            switch (GetState())
             {
                 case EnemyState.Wait:
-                    
-                    elapsedTime += Time.deltaTime;
-                    if (elapsedTime > waitTime)
+
+                    _elapsedTime += Time.deltaTime;
+                    if (_elapsedTime > waitTime)
                     {
                         SetState(EnemyState.Walk);
                     }
@@ -258,7 +272,7 @@ namespace StarterAssets
 
                     if (Vector3.Distance(transform.position, _destination) < 1.0f)
                     {
-                        SetState(EnemyState.Wait);
+                        SetState(EnemyState.Block);
                         _animator.SetFloat(_animIDSpeed, 0.0f);
                     }
                     break;
@@ -380,18 +394,32 @@ namespace StarterAssets
 
         private void Attack()
         {
-            _animator.SetBool(_animIDBoxing, false);
-            if (Input.GetMouseButtonDown(1))
+            //_animator.SetBool(_animIDBoxing, false);
+            //if (Input.GetMouseButtonDown(1))
+            //{
+            //    _animator.SetBool(_animIDBoxing, true);
+            //}
+
+            //_animator.SetBool(_animIDLeftPunch, false);
+            //if (Input.GetMouseButtonDown(0))
+            //{
+            //    _animator.SetBool(_animIDLeftPunch, true);
+            //}
+
+            if (GetState() == EnemyState.Block)
             {
-                //_animator.SetTrigger("Boxing");
-                _animator.SetBool(_animIDBoxing, true);
+                _animator.SetBool(_animIDBlock, true);
+            }
+            else
+            {
+                _animator.SetBool(_animIDBlock, false);
             }
 
-            _animator.SetBool(_animIDLeftPunch, false);
-            if (Input.GetMouseButtonDown(0))
-            {
-                _animator.SetBool(_animIDLeftPunch, true);
-            }
+            //if (Vector3.Distance(transform.position, _destination) >= 1.0f)
+            //{
+            //    SetState(EnemyState.Wait);
+            //    _animator.SetFloat(_animIDSpeed, 0.0f);
+            //}
         }
 
         public float _damage = 0;
@@ -400,6 +428,10 @@ namespace StarterAssets
         {
             if (_damage > 0)
             {
+                if (GetState() == EnemyState.Block)
+                {
+                    _isBlockRest = true;
+                }
                 _controller.Move(_damageVec * _damage * Time.deltaTime);
                 _damage = _damage - 1;
             }
@@ -407,22 +439,22 @@ namespace StarterAssets
 
         public void SetState(EnemyState tempState, Transform targetObj = null)
         {
-            if (tempState == EnemyState.Walk)
+            if (tempState == EnemyState.Walk || tempState == EnemyState.Block)
             {
-                elapsedTime = 0f;
-                state = tempState;
+                _elapsedTime = 0f;
+                _state = tempState;
                 CreateRandomPosition();
             }
             else if (tempState == EnemyState.Chase)
             {
-                state = tempState;
+                _state = tempState;
                 //　追いかける対象をセット
                 playerTransform = targetObj;
             }
             else if (tempState == EnemyState.Wait)
             {
-                elapsedTime = 0f;
-                state = tempState;
+                _elapsedTime = 0f;
+                _state = tempState;
                 velocity = Vector3.zero;
                 _animator.SetFloat("Speed", 0f);
             }
@@ -430,7 +462,7 @@ namespace StarterAssets
 
         public EnemyState GetState()
         {
-            return state;
+            return _state;
         }
     }
 }

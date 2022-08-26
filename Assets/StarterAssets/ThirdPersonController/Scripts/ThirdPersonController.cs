@@ -99,6 +99,7 @@ namespace StarterAssets
         private int _animIDMotionSpeed;
         private int _animIDLeftPunch;
         private int _animIDRightPunch;
+        private int _animIDBlock;
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         private PlayerInput _playerInput;
@@ -178,6 +179,7 @@ namespace StarterAssets
             _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
             _animIDLeftPunch = Animator.StringToHash("LeftPunch");
             _animIDRightPunch = Animator.StringToHash("RightPunch");
+            _animIDBlock = Animator.StringToHash("Block");
         }
 
         private void GroundedCheck()
@@ -408,6 +410,15 @@ namespace StarterAssets
             {
                 _animator.SetBool(_animIDRightPunch, true);
                 _input.rightPunch = false;
+            }
+
+            if (_input.block)
+            {
+                _animator.SetBool(_animIDBlock, true);
+            }
+            else
+            {
+                _animator.SetBool(_animIDBlock, false);
             }
         }
     }
