@@ -39,7 +39,7 @@ public class AttackForce : MonoBehaviour
         {
             if (enemyController.GetState() == EnemyState.Block)
             {
-                enemyController._damage = 5;
+                enemyController._damage = 20;
             }
             else
             {
@@ -52,7 +52,7 @@ public class AttackForce : MonoBehaviour
         {
             if (enemyController.GetState() == EnemyState.Block)
             {
-                enemyController._damage = 10;
+                enemyController._damage = 35;
             }
             else
             {

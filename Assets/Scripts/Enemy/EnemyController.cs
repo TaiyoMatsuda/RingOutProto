@@ -115,16 +115,20 @@ namespace StarterAssets
         //　待ち時間
         [SerializeField]
         private float waitTime = 5f;
+        [SerializeField]
+        private float deleteTime;
 
         private float _elapsedTime;
         private EnemyState _state;
         public bool _isBlockRest = false;
-        private float _blockRestTime = 5f;
         //　プレイヤーTransform
         private Transform playerTransform;
 
-
         private Vector3 startPosition;
+
+        [SerializeField]
+        private GameObject effectObject;
+        private GameObject _instatiateEffect;
 
         private void Start()
         {
@@ -463,6 +467,16 @@ namespace StarterAssets
         public EnemyState GetState()
         {
             return _state;
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {            
+            if (hit.gameObject.name == "ReducingStockArea")
+            {
+                Destroy(this.gameObject);
+                _instatiateEffect = GameObject.Instantiate(effectObject, transform.position + new Vector3(0f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f)) as GameObject;
+                Destroy(_instatiateEffect, deleteTime);
+            }
         }
     }
 }
