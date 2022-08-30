@@ -113,6 +113,12 @@ namespace StarterAssets
 
         private bool _hasAnimator;
 
+        [SerializeField]
+        private GameObject effectObject;
+        private GameObject _instatiateEffect;
+        [SerializeField]
+        private float deleteTime;
+
         private bool IsCurrentDeviceMouse
         {
             get
@@ -419,6 +425,16 @@ namespace StarterAssets
             else
             {
                 _animator.SetBool(_animIDBlock, false);
+            }
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            if (hit.gameObject.name == "ReducingStockArea")
+            {
+                Destroy(this.gameObject);
+                _instatiateEffect = GameObject.Instantiate(effectObject, transform.position + new Vector3(0f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f)) as GameObject;
+                Destroy(_instatiateEffect, deleteTime);
             }
         }
     }
