@@ -7,6 +7,7 @@ TagManager:
   - CinemachineTarget
   - Enemy
   - Arena
+  - EnemyRespawn
   layers:
   - Default
   - TransparentFX
