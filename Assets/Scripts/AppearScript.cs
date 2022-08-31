@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class AppearScript : MonoBehaviour
@@ -29,29 +30,51 @@ public class AppearScript : MonoBehaviour
 		elapsedTime = 0f;
 	}
 
-	void Update()
+	//void Update()
+	//{
+	//	if (numberOfEnemys >= maxNumOfEnemys)
+	//	{
+	//		return;
+	//	}
+	//	//　経過時間を足す
+	//	elapsedTime += Time.deltaTime;
+		
+	//	if (elapsedTime > appearEffectNextTime && _isNoneEffect)
+	//	{
+	//		_isNoneEffect = false;
+	//		_instatiateEffect = GameObject.Instantiate(effectObject, transform.position + new Vector3(0f, offset, 0f), Quaternion.Euler(-90f, 0f, 0f)) as GameObject;
+	//	}
+
+	//	if (elapsedTime > appearEnemyNextTime)
+	//	{
+	//		_isNoneEffect = true;
+	//		elapsedTime = 0f;
+
+	//		AppearEnemy();
+	//		Destroy(_instatiateEffect, deleteTime);
+	//	}
+	//}
+	public void Respawn()
+    {
+		StartCoroutine("Coroutine");
+	}
+
+	private IEnumerator Coroutine()
 	{
+		yield return new WaitForSeconds(2.0f);
+
 		if (numberOfEnemys >= maxNumOfEnemys)
 		{
-			return;
+			yield break;
 		}
-		//　経過時間を足す
-		elapsedTime += Time.deltaTime;
-		
-		if (elapsedTime > appearEffectNextTime && _isNoneEffect)
-		{
-			_isNoneEffect = false;
-			_instatiateEffect = GameObject.Instantiate(effectObject, transform.position + new Vector3(0f, offset, 0f), Quaternion.Euler(-90f, 0f, 0f)) as GameObject;
-		}
+		_instatiateEffect = GameObject.Instantiate(effectObject, transform.position + new Vector3(0f, offset, 0f), Quaternion.Euler(-90f, 0f, 0f)) as GameObject;
 
-		if (elapsedTime > appearEnemyNextTime)
-		{
-			_isNoneEffect = true;
-			elapsedTime = 0f;
+		yield return new WaitForSeconds(1.0f);
 
-			AppearEnemy();
-			Destroy(_instatiateEffect, deleteTime);
-		}
+		AppearEnemy();
+		Destroy(_instatiateEffect, deleteTime);
+
+		yield break;
 	}
 
 	//　敵出現メソッド
