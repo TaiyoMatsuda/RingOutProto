@@ -95,7 +95,7 @@ namespace StarterAssets
 
         private bool _hasAnimator;
 
-        private AppearScript _appearScript;
+        private RespawnEnemy _respawnEnemy;
         
         public enum EnemyState
         {
@@ -150,8 +150,8 @@ namespace StarterAssets
             startPosition = transform.position;
             _destination = transform.position;
 
-            var EnemyRespawn = GameObject.FindGameObjectsWithTag("EnemyRespawn");
-            _appearScript = EnemyRespawn[0].GetComponent<AppearScript>();
+            var enemyRespawn = GameObject.FindGameObjectsWithTag("EnemyRespawn");
+            _respawnEnemy = enemyRespawn[0].GetComponent<RespawnEnemy>();
         }
 
         public void CreateRandomPosition()
@@ -481,7 +481,7 @@ namespace StarterAssets
                 _instatiateEffect = GameObject.Instantiate(effectObject, transform.position + new Vector3(0f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f)) as GameObject;
                 Destroy(_instatiateEffect, deleteTime);
 
-                _appearScript.Respawn();
+                _respawnEnemy.Respawn();
             }
         }
     }

@@ -119,6 +119,8 @@ namespace StarterAssets
         [SerializeField]
         private float deleteTime;
 
+        private RespawnPlayer _respawnPlayer;
+
         private bool IsCurrentDeviceMouse
         {
             get
@@ -130,7 +132,6 @@ namespace StarterAssets
 #endif
             }
         }
-
 
         private void Awake()
         {
@@ -159,6 +160,9 @@ namespace StarterAssets
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+
+            var playerRespawn = GameObject.FindGameObjectsWithTag("PlayerRespawn");
+            _respawnPlayer = playerRespawn[0].GetComponent<RespawnPlayer>();
         }
 
         private void Update()
@@ -435,6 +439,8 @@ namespace StarterAssets
                 Destroy(this.gameObject);
                 _instatiateEffect = GameObject.Instantiate(effectObject, transform.position + new Vector3(0f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f)) as GameObject;
                 Destroy(_instatiateEffect, deleteTime);
+
+                _respawnPlayer.Respawn();
             }
         }
     }

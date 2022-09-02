@@ -8,6 +8,8 @@ TagManager:
   - Enemy
   - Arena
   - EnemyRespawn
+  - PlayerRespawn
+  - PlayerFollowCamera
   layers:
   - Default
   - TransparentFX

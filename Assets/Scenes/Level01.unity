@@ -1102,7 +1102,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh24912
+  m_Name: pb_Mesh25274
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -1741,6 +1741,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerFollowCamera
       objectReference: {fileID: 0}
+    - target: {fileID: 2070925441746177671, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2070925441746177671, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+      propertyPath: m_TagString
+      value: PlayerFollowCamera
+      objectReference: {fileID: 0}
     - target: {fileID: 2070925441746177912, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1799,6 +1807,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+--- !u!114 &1511503079 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2070925441746177913, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+  m_PrefabInstance: {fileID: 1268254180}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45e653bab7fb20e499bda25e1b646fea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!850595691 &1652212117
 LightingSettings:
   m_ObjectHideFlags: 0
@@ -1966,6 +1985,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Respawn
       objectReference: {fileID: 0}
+    - target: {fileID: 2036555139927175653, guid: bb43c2eeaff6fcb4887e2a36f431243d, type: 3}
+      propertyPath: m_TagString
+      value: PlayerRespawn
+      objectReference: {fileID: 0}
     - target: {fileID: 2911502778514966473, guid: bb43c2eeaff6fcb4887e2a36f431243d, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -2022,7 +2045,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2036555139927175653, guid: bb43c2eeaff6fcb4887e2a36f431243d, type: 3}
   m_PrefabInstance: {fileID: 1875268772}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1875268776
+--- !u!114 &1875268775
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2031,17 +2054,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1875268774}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c585ee0d0b4af3409a3ca665bf520f3, type: 3}
+  m_Script: {fileID: 11500000, guid: 7e8db0f6f3ad26b4d88fbc6b5995f4ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  players:
-  - {fileID: 3991081803230554187, guid: 0531ea79a70732d4592ffa4322f4fc20, type: 3}
-  appearPlayerNextTime: 5
-  maxNumOfPlayers: 1
+  player: {fileID: 3991081803230554187, guid: 0531ea79a70732d4592ffa4322f4fc20, type: 3}
+  _residueNum: 3
   effectObject: {fileID: 5741862705882466764, guid: e58efb9915213194ca00fc7a2f6b8fce, type: 3}
-  appearEffectNextTime: 4
-  deleteTime: 1
+  deleteTime: 2
   offset: -1
+  _playerFollowCamera: {fileID: 1511503079}
 --- !u!1 &2047238305
 GameObject:
   m_ObjectHideFlags: 0
@@ -2057,7 +2078,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2047238306
 Transform:
   m_ObjectHideFlags: 0
@@ -2129,6 +2150,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8760962478074024208, guid: 0531ea79a70732d4592ffa4322f4fc20, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0531ea79a70732d4592ffa4322f4fc20, type: 3}
 --- !u!1001 &3674638775984117726
@@ -2185,7 +2210,7 @@ PrefabInstance:
     - target: {fileID: 3674638774397722219, guid: 8262f6e5c78387e498688dc3232a88a4, type: 3}
       propertyPath: _appearScript
       value: 
-      objectReference: {fileID: 9218852520628400962}
+      objectReference: {fileID: 0}
     - target: {fileID: 3674638774397722227, guid: 8262f6e5c78387e498688dc3232a88a4, type: 3}
       propertyPath: m_Name
       value: Enemy
@@ -2263,7 +2288,12 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8760962478074024215, guid: 0531ea79a70732d4592ffa4322f4fc20, type: 3}
   m_PrefabInstance: {fileID: 733868072527938150}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &9218852520628400962
+--- !u!4 &9218852520628400963 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2911502778514966473, guid: bb43c2eeaff6fcb4887e2a36f431243d, type: 3}
+  m_PrefabInstance: {fileID: 6307376901714850952}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9218852520628400964
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2272,19 +2302,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 5461460913836868973}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3177488d612b310449ce66f2d4582cb6, type: 3}
+  m_Script: {fileID: 11500000, guid: 499c8a5b54b77bb49bb6955709b41549, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemys:
+  _enemys:
   - {fileID: 3674638774397722227, guid: 8262f6e5c78387e498688dc3232a88a4, type: 3}
-  appearEnemyNextTime: 5
-  maxNumOfEnemys: 3
+  _residueNum: 3
   effectObject: {fileID: 1423750961078911411, guid: 30797a1f50f87e940af21cf63ad2b4b1, type: 3}
-  appearEffectNextTime: 4
-  deleteTime: 1
+  deleteTime: 3
   offset: -1
---- !u!4 &9218852520628400963 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2911502778514966473, guid: bb43c2eeaff6fcb4887e2a36f431243d, type: 3}
-  m_PrefabInstance: {fileID: 6307376901714850952}
-  m_PrefabAsset: {fileID: 0}
