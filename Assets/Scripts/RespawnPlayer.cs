@@ -38,6 +38,8 @@ public class RespawnPlayer : MonoBehaviour
 		RespawnCharacter();
 		Destroy(instatiateEffect, deleteTime);
 
+		var CinemachineTarget = GameObject.FindGameObjectsWithTag("CinemachineTarget");
+		_playerFollowCamera.Follow = CinemachineTarget[0].transform;
 		yield break;
 	}
 
@@ -45,7 +47,5 @@ public class RespawnPlayer : MonoBehaviour
 	{
 		GameObject.Instantiate(player, transform.position, Quaternion.Euler(0f, 0f, 0f));
 		_residueNum--;
-
-		_playerFollowCamera.Follow = player.transform.Find("PlayerCameraRoot");
 	}
 }
