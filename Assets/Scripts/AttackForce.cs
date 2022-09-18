@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static StarterAssets.EnemyController;
+using static StarterAssets.SecondPlayerController;
 
 public class AttackForce : MonoBehaviour
 {
@@ -25,7 +26,7 @@ public class AttackForce : MonoBehaviour
             return;
         }
 
-        EnemyController enemyController = other.GetComponent<EnemyController>();
+        SecondPlayerController enemyController = other.GetComponent<SecondPlayerController>();
         if (!enemyController)
         {
             return;
@@ -37,7 +38,7 @@ public class AttackForce : MonoBehaviour
         Animator animator = _me.GetComponent<Animator>();
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("LeftPunch"))
         {
-            if (enemyController.GetState() == EnemyState.Block)
+            if (enemyController.GetState() == SecondPlayerState.Block)
             {
                 enemyController._damage = 20;
             }
@@ -50,7 +51,7 @@ public class AttackForce : MonoBehaviour
 
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("RightPunch"))
         {
-            if (enemyController.GetState() == EnemyState.Block)
+            if (enemyController.GetState() == SecondPlayerState.Block)
             {
                 enemyController._damage = 35;
             }
