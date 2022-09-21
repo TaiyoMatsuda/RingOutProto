@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DG.Tweening;
+using System;
 using UniRx;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -422,19 +423,36 @@ namespace StarterAssets
             //}
         }
 
-        public float _damage = 0;
+        public IReadOnlyReactiveProperty<int> DamageSum => _damageSum;
+
+        private readonly IntReactiveProperty _damageSum = new IntReactiveProperty(0);
+
+        public int _damage = 0;
         public Vector3 _damageVec;
         private void Damage()
         {
-            if (_damage > 0)
+            if (_damage <= 0)
             {
-                if (GetState() == SecondPlayerState.Block)
-                {
-                    _isBlockRest = true;
-                }
-                _controller.Move(_damageVec * _damage * Time.deltaTime);
-                _damage = _damage - 1;
+                return;
             }
+
+            if (GetState() == SecondPlayerState.Block)
+            {
+                _isBlockRest = false;
+            }
+            //_controller.Move(_damageVec * _damage * Time.deltaTime);
+            //_damage = _damage - 1;
+            _damageSum.Value += _damage;
+            DOTween.To(
+                () => _controller.transform.position,
+                v => {
+                    Vector3 velocity = (v - transform.position) * Time.deltaTime;
+                    _controller.Move(velocity);
+                },
+                transform.position + (_damageVec * _damage),
+                0.5f
+            ).SetEase(Ease.OutCubic);
+            _damage = 0;
         }
 
         public void SetState(SecondPlayerState tempState, Transform targetObj = null)
@@ -477,11 +495,6 @@ namespace StarterAssets
                 OnDestroy();
                 return;
             }
-
-            if (hit.gameObject.name == "LeftHand")
-            {
-                Debug.Log("LeftHand");
-            }
         }
 
         public IObservable<Unit> PlayerDeadAsync => _playerDeadSubject;
@@ -495,13 +508,15 @@ namespace StarterAssets
 
         private void OnDestroy()
         {
-            Destroy(this.gameObject);
             _instatiateEffect = GameObject.Instantiate(_effectObject, transform.position + new Vector3(0f, 0f, 0f), Quaternion.Euler(-90f, 0f, 0f)) as GameObject;
             Destroy(_instatiateEffect, _deleteTime);
+            Destroy(this.gameObject);
 
             _playerDeadSubject.OnNext(Unit.Default);
             _playerDeadSubject.OnCompleted();
             _playerDeadSubject.Dispose();
+
+            _damageSum.Dispose();
         }
     }
 }
