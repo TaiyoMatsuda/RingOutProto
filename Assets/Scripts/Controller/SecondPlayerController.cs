@@ -440,8 +440,7 @@ namespace StarterAssets
             {
                 _isBlockRest = false;
             }
-            //_controller.Move(_damageVec * _damage * Time.deltaTime);
-            //_damage = _damage - 1;
+            
             _damageSum.Value += _damage;
             DOTween.To(
                 () => _controller.transform.position,
