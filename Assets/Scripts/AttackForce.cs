@@ -1,9 +1,8 @@
 using StarterAssets;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using static StarterAssets.EnemyController;
 using static StarterAssets.SecondPlayerController;
+using UniRx;
 
 public class AttackForce : MonoBehaviour
 {
@@ -12,16 +11,19 @@ public class AttackForce : MonoBehaviour
     public float _forceHeight = 0;       //吹き飛ばす高さ調整値
     public float _forcePower = 0;        //吹き飛ばす強さ調整値
 
+    public IReactiveCollection<SecondPlayerController> Players => _players;
+    private readonly ReactiveCollection<SecondPlayerController> _players = new ReactiveCollection<SecondPlayerController>();
+
+
     private void OnTriggerEnter(Collider other)
     {
-
-        ////除外対象のタグがついたゲームオブジェクトだったら何もしない
-        //if (_earthTag == other.tag)
+        //自分の体は除外
+        //if (_me && _me == other.gameObject)
         //{
         //    return;
         //}
-        //自分の体は除外
-        if (_me && _me == other.gameObject)
+
+        if (other.gameObject.tag != "Enemy")
         {
             return;
         }

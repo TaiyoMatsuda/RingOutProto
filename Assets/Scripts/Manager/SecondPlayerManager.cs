@@ -12,12 +12,17 @@ public class SecondPlayerManager : MonoBehaviour
     [SerializeField]
     private SecondPlayerController _secondPlayerPrefab;
     [SerializeField] 
-    private SecondPlayerStockPresenter _presenter;
+    private SecondPlayerPresenter _presenter;
     private SecondPlayerController _currentPlayer;
 
     private void Start()
     {
         CreatePlayer();
+    }
+
+    private void OnPlayerDamage(int damage)
+    {
+        _presenter.OnPlayerDamage(damage);
     }
 
     public void OnPlayerDead()
@@ -32,9 +37,7 @@ public class SecondPlayerManager : MonoBehaviour
     {
         _currentPlayer = Instantiate(_secondPlayerPrefab);
 
-        _currentPlayer
-            .PlayerDeadAsync
-            .Subscribe(_ => OnPlayerDead())
-            .AddTo(this);
+        _currentPlayer.DamageSum.Subscribe(damage => OnPlayerDamage(damage)).AddTo(this);
+        _currentPlayer.PlayerDeadAsync.Subscribe(_ => OnPlayerDead()).AddTo(this);
     }
 }
