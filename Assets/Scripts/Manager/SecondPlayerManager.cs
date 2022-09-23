@@ -30,6 +30,10 @@ public class SecondPlayerManager : MonoBehaviour
         //_currentPlayer = null;
         _presenter.OnPlayerDead();
 
+        if (_presenter.StockNum <= 1)
+        {
+            return;
+        }
         CreatePlayer();
     }
 
