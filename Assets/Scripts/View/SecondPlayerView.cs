@@ -16,16 +16,24 @@ public class SecondPlayerView : MonoBehaviour
 
     private int _tempDamageValue;
 
-    void Start()
+    public int StockNum
     {
-        SetDamage(Convert.ToInt32(_damage.text));
+        get
+        {
+            return _stock.transform.childCount;
+        }
     }
 
     public void DeleteStock()
     {
         var childGameObjects = _stock.GetComponentsInChildren<Transform>().Select(t => t.gameObject).Last();
         Destroy(childGameObjects);
-
+        
+        if (StockNum <= 1)
+        {
+            Destroy(_damage);
+            return;
+        }
         _damage.text = "0 %";
     }
 
