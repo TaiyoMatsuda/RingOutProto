@@ -455,7 +455,6 @@ namespace StarterAssets
             else if (tempState == State.Chase)
             {
                 _state = tempState;
-                //　追いかける対象をセット
                 playerTransform = targetObj;
             }
             else if (tempState == State.Wait)

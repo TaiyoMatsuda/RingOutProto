@@ -1,15 +1,14 @@
-using StarterAssets;
 using UnityEngine;
 using static IMortality;
 
 public class SearchFirstPlayer : MonoBehaviour
 {
 
-    private SecondPlayerController _controller;
+    private IMortality _controller;
 
     void Start()
     {
-        _controller = GetComponentInParent<SecondPlayerController>();
+        _controller = this.transform.root.gameObject.GetComponent<IMortality>();
     }
 
     void OnTriggerStay(Collider col)
