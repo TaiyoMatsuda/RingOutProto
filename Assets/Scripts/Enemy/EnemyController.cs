@@ -1,6 +1,9 @@
-﻿using UnityEngine;
+﻿using DG.Tweening;
+using UniRx;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
+using static IMortality;
 #endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
@@ -9,7 +12,7 @@ using UnityEngine.InputSystem;
 namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
-    public class EnemyController : MonoBehaviour
+    public class EnemyController : MonoBehaviour, IMortality
     {
         [Header("Enemy")]
         [Tooltip("Move speed of the character in m/s")]
@@ -97,13 +100,6 @@ namespace StarterAssets
 
         private RespawnEnemy _respawnEnemy;
         
-        public enum EnemyState
-        {
-            Walk,
-            Wait,
-            Chase,
-            Block
-        };
 
         //　目的地
         private Vector3 _destination;
@@ -120,7 +116,7 @@ namespace StarterAssets
         private float deleteTime;
 
         private float _elapsedTime;
-        private EnemyState _state;
+        private State _state;
         public bool _isBlockRest = false;
         //　プレイヤーTransform
         private Transform playerTransform;
@@ -145,7 +141,7 @@ namespace StarterAssets
             CreateRandomPosition();
             velocity = Vector3.zero;
             _elapsedTime = 0f;
-            SetState(EnemyState.Walk);
+            SetState(State.Walk);
 
             startPosition = transform.position;
             _destination = transform.position;
@@ -180,7 +176,6 @@ namespace StarterAssets
             GroundedCheck();
             Move();
             Attack();
-            Damage();
         }
 
         private void LateUpdate()
@@ -231,16 +226,16 @@ namespace StarterAssets
 
             switch (GetState())
             {
-                case EnemyState.Wait:
+                case State.Wait:
 
                     _elapsedTime += Time.deltaTime;
                     if (_elapsedTime > waitTime)
                     {
-                        SetState(EnemyState.Walk);
+                        SetState(State.Walk);
                     }
                     break;
 
-                case EnemyState.Walk:
+                case State.Walk:
 
                     if (_controller.isGrounded)
                     {
@@ -257,12 +252,12 @@ namespace StarterAssets
 
                     if (Vector3.Distance(transform.position, _destination) < 2.0f)
                     {
-                        SetState(EnemyState.Wait);
+                        SetState(State.Wait);
                         _animator.SetFloat(_animIDSpeed, 0.0f);
                     }
                     break;
 
-                case EnemyState.Chase:
+                case State.Chase:
 
                     _destination = playerTransform.position;
                     if (_controller.isGrounded)
@@ -280,7 +275,7 @@ namespace StarterAssets
 
                     if (Vector3.Distance(transform.position, _destination) < 1.0f)
                     {
-                        SetState(EnemyState.Block);
+                        SetState(State.Block);
                         _animator.SetFloat(_animIDSpeed, 0.0f);
                     }
                     break;
@@ -414,7 +409,7 @@ namespace StarterAssets
             //    _animator.SetBool(_animIDLeftPunch, true);
             //}
 
-            if (GetState() == EnemyState.Block)
+            if (GetState() == State.Block)
             {
                 _animator.SetBool(_animIDBlock, true);
             }
@@ -425,41 +420,54 @@ namespace StarterAssets
 
             //if (Vector3.Distance(transform.position, _destination) >= 1.0f)
             //{
-            //    SetState(EnemyState.Wait);
+            //    SetState(State.Wait);
             //    _animator.SetFloat(_animIDSpeed, 0.0f);
             //}
         }
 
-        public float _damage = 0;
-        public Vector3 _damageVec;
-        private void Damage()
+        public IReadOnlyReactiveProperty<int> DamageSum => _damageSum;
+
+        private readonly IntReactiveProperty _damageSum = new IntReactiveProperty(0);
+
+        public void AddDamage(int damage, Vector3 damageVec)
         {
-            if (_damage > 0)
+            if (damage <= 0)
             {
-                if (GetState() == EnemyState.Block)
-                {
-                    _isBlockRest = true;
-                }
-                _controller.Move(_damageVec * _damage * Time.deltaTime);
-                _damage = _damage - 1;
+                return;
             }
+
+            if (GetState() == State.Block)
+            {
+                _isBlockRest = false;
+            }
+
+            _damageSum.Value += damage;
+            DOTween.To(
+                () => _controller.transform.position,
+                v => {
+                    Vector3 velocity = (v - transform.position) * Time.deltaTime;
+                    _controller.Move(velocity);
+                },
+                transform.position + (damageVec * damage),
+                0.5f
+            ).SetEase(Ease.OutCubic);
         }
 
-        public void SetState(EnemyState tempState, Transform targetObj = null)
+        public void SetState(State tempState, Transform targetObj = null)
         {
-            if (tempState == EnemyState.Walk || tempState == EnemyState.Block)
+            if (tempState == State.Walk || tempState == State.Block)
             {
                 _elapsedTime = 0f;
                 _state = tempState;
                 CreateRandomPosition();
             }
-            else if (tempState == EnemyState.Chase)
+            else if (tempState == State.Chase)
             {
                 _state = tempState;
                 //　追いかける対象をセット
                 playerTransform = targetObj;
             }
-            else if (tempState == EnemyState.Wait)
+            else if (tempState == State.Wait)
             {
                 _elapsedTime = 0f;
                 _state = tempState;
@@ -468,7 +476,7 @@ namespace StarterAssets
             }
         }
 
-        public EnemyState GetState()
+        public State GetState()
         {
             return _state;
         }

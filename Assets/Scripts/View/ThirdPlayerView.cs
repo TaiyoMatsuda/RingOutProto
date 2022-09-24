@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SecondPlayerView : MonoBehaviour
+public class ThirdPlayerView : MonoBehaviour
 {
 
     [SerializeField]

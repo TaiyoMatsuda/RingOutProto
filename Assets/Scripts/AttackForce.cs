@@ -1,8 +1,7 @@
 using StarterAssets;
-using UnityEngine;
-using static StarterAssets.EnemyController;
-using static StarterAssets.SecondPlayerController;
 using UniRx;
+using UnityEngine;
+using static IMortality;
 
 public class AttackForce : MonoBehaviour
 {
@@ -18,18 +17,18 @@ public class AttackForce : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         //é©ï™ÇÃëÃÇÕèúäO
-        //if (_me && _me == other.gameObject)
-        //{
-        //    return;
-        //}
+        if (_me && _me == other.gameObject)
+        {
+            return;
+        }
 
         if (other.gameObject.tag != "Enemy")
         {
             return;
         }
 
-        SecondPlayerController enemyController = other.GetComponent<SecondPlayerController>();
-        if (!enemyController)
+        var target = other.GetComponent<IMortality>();
+        if (target is null)
         {
             return;
         }
@@ -40,28 +39,26 @@ public class AttackForce : MonoBehaviour
         Animator animator = _me.GetComponent<Animator>();
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("LeftPunch"))
         {
-            if (enemyController.GetState() == SecondPlayerState.Block)
+            if (target.GetState() == State.Block)
             {
-                enemyController._damage = 20;
+                target.AddDamage(20, toVec);
             }
             else
             {
-                enemyController._damage = 50;
+                target.AddDamage(50, toVec);
             }
-            enemyController._damageVec = toVec;
         }
 
         if (animator.GetCurrentAnimatorStateInfo(0).IsName("RightPunch"))
         {
-            if (enemyController.GetState() == SecondPlayerState.Block)
+            if (target.GetState() == State.Block)
             {
-                enemyController._damage = 35;
+                target.AddDamage(35, toVec);
             }
             else
             {
-                enemyController._damage = 100;
+                target.AddDamage(100, toVec);
             }
-            enemyController._damageVec = toVec;
         }
     }
 

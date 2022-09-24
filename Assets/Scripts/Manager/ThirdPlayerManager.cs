@@ -3,12 +3,12 @@ using StarterAssets;
 using UniRx;
 using UnityEngine;
 
-public class SecondPlayerManager : MonoBehaviour
+public class ThirdPlayerManager : MonoBehaviour
 {
     [SerializeField]
-    private SecondPlayerController _secondPlayerPrefab;
-    [SerializeField] 
-    private SecondPlayerPresenter _presenter;
+    private ThirdPlayerController _thirdPlayerPrefab;
+    [SerializeField]
+    private ThirdPlayerPresenter _presenter;
 
     private void Start()
     {
@@ -33,7 +33,7 @@ public class SecondPlayerManager : MonoBehaviour
 
     private void CreatePlayer()
     {
-        var currentPlayer = Instantiate(_secondPlayerPrefab);
+        var currentPlayer = Instantiate(_thirdPlayerPrefab);
         currentPlayer.DamageSum.Subscribe(damage => OnPlayerDamage(damage)).AddTo(this);
         currentPlayer.PlayerDeadAsync.Subscribe(_ => OnPlayerDead()).AddTo(this);
     }

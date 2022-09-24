@@ -11,9 +11,9 @@ using Random = UnityEngine.Random;
 namespace StarterAssets
 {
     [RequireComponent(typeof(CharacterController))]
-    public class SecondPlayerController : MonoBehaviour, IMortality
+    public class ThirdPlayerController : MonoBehaviour, IMortality
     {
-        [Header("Second Player")]
+        [Header("Enemy")]
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 10.0f;
 
@@ -32,7 +32,7 @@ namespace StarterAssets
         [Range(0, 1)] public float FootstepAudioVolume = 0.5f;
 
         [Space(10)]
-        [Tooltip("The height the second player can jump")]
+        [Tooltip("The height the enemy can jump")]
         public float JumpHeight = 1.2f;
 
         [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
@@ -45,7 +45,7 @@ namespace StarterAssets
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
 
-        [Header("Second Player Grounded")]
+        [Header("Enemy Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
         public bool Grounded = true;
 
@@ -70,7 +70,7 @@ namespace StarterAssets
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
 
-        // second player
+        // enemy
         private float _speed;
         private float _animationBlend;
         private float _verticalVelocity;
@@ -93,10 +93,13 @@ namespace StarterAssets
         private Animator _animator;
         private CharacterController _controller;
 
+        private const float _threshold = 0.01f;
+
         private bool _hasAnimator;
 
-        //private RespawnEnemy _respawnEnemy;
+        private RespawnEnemy _respawnEnemy;
         
+
         //　目的地
         private Vector3 _destination;
         //　速度
@@ -136,8 +139,8 @@ namespace StarterAssets
             startPosition = transform.position;
             _destination = transform.position;
 
-            //var enemyRespawn = GameObject.FindGameObjectsWithTag("EnemyRespawn");
-            //_respawnEnemy = enemyRespawn[0].GetComponent<RespawnEnemy>();
+            var enemyRespawn = GameObject.FindGameObjectsWithTag("EnemyRespawn");
+            _respawnEnemy = enemyRespawn[0].GetComponent<RespawnEnemy>();
         }
 
         public void CreateRandomPosition()
@@ -410,7 +413,7 @@ namespace StarterAssets
 
             //if (Vector3.Distance(transform.position, _destination) >= 1.0f)
             //{
-            //    SetState(EnemyState.Wait);
+            //    SetState(State.Wait);
             //    _animator.SetFloat(_animIDSpeed, 0.0f);
             //}
         }
@@ -430,7 +433,7 @@ namespace StarterAssets
             {
                 _isBlockRest = false;
             }
-            
+
             _damageSum.Value += damage;
             DOTween.To(
                 () => _controller.transform.position,
@@ -441,7 +444,6 @@ namespace StarterAssets
                 transform.position + (damageVec * damage),
                 0.5f
             ).SetEase(Ease.OutCubic);
-            //_damage = 0;
         }
 
         public void SetState(State tempState, Transform targetObj = null)
