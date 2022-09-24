@@ -14,4 +14,6 @@ public interface IMortality
 
     public void AddDamage(int damage, Vector3 damageVec);
     public State GetState();
+
+    public void SetState(State tempState, Transform targetObj = null);
 }
