@@ -1,6 +1,6 @@
-using UnityEngine;
-using System.Collections;
 using StarterAssets;
+using UnityEngine;
+using static IMortality;
 
 public class SearchFirstPlayer : MonoBehaviour
 {
@@ -14,16 +14,12 @@ public class SearchFirstPlayer : MonoBehaviour
 
     void OnTriggerStay(Collider col)
     {
-        //　プレイヤーキャラクターを発見
         if (col.tag == "Player")
         {
-            //　敵キャラクターの状態を取得
-            SecondPlayerController.SecondPlayerState state = _controller.GetState();
-            //　敵キャラクターが追いかける状態でなければ追いかける設定に変更
-            if (state != SecondPlayerController.SecondPlayerState.Chase)
+            State state = _controller.GetState();
+            if (state != State.Chase)
             {
-                Debug.Log("プレイヤー発見");
-                _controller.SetState(SecondPlayerController.SecondPlayerState.Chase, col.transform);
+                _controller.SetState(State.Chase, col.transform);
             }
         }
     }
@@ -32,8 +28,7 @@ public class SearchFirstPlayer : MonoBehaviour
     {
         if (col.tag == "Player")
         {
-            Debug.Log("見失う");
-            _controller.SetState(SecondPlayerController.SecondPlayerState.Wait);
+            _controller.SetState(State.Wait);
         }
     }
 }
