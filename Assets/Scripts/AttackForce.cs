@@ -6,7 +6,6 @@ using static IMortality;
 public class AttackForce : MonoBehaviour
 {
     public GameObject _me;
-    //public string _earthTag;
     public float _forceHeight = 0;       //‚«”ò‚Î‚·‚‚³’²®’l
     public float _forcePower = 0;        //‚«”ò‚Î‚·‹­‚³’²®’l
 
