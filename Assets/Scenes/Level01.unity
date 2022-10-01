@@ -5323,6 +5323,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3991081803230554176, guid: 0531ea79a70732d4592ffa4322f4fc20, type: 3}
+      propertyPath: JumpHeight
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3991081803230554187, guid: 0531ea79a70732d4592ffa4322f4fc20, type: 3}
       propertyPath: m_Name
       value: PlayerArmature
