@@ -7,14 +7,13 @@ namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
-		[Header("Character Input Values")]
-		public Vector2 move;
-		public Vector2 look;
-		public bool jump;
-		public bool sprint;
-		public bool leftPunch;
-		public bool rightPunch;
-		public bool block;
+		public Vector2 Move { get; set; }
+        public Vector2 Look { get; set; }
+        public bool Jump { get; set; }
+        public bool LeftPunch { get; set; }
+        public bool RightPunch { get; set; }
+        public bool Block { get; private set; }
+		public bool AirRun { get; set; }
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -42,11 +41,6 @@ namespace StarterAssets
 			JumpInput(value.isPressed);
 		}
 
-		public void OnSprint(InputValue value)
-		{
-			SprintInput(value.isPressed);
-		}
-
 		public void OnLeftPunch(InputValue value)
 		{
 			LeftPunchInput(value.isPressed);
@@ -57,49 +51,53 @@ namespace StarterAssets
 			RightPunchInput(value.isPressed);
 		}
 
-		public void OnBlock(InputValue value)
+        public void OnBlock(InputValue value)
         {
-			BlockInput(value.isPressed);
+            BlockInput(value.isPressed);
+        }
+
+        public void OnAirRun(InputValue value)
+        {
+            AirRunInput(value.isPressed);
         }
 #endif
 
-
-		public void MoveInput(Vector2 newMoveDirection)
+        public void MoveInput(Vector2 newMoveDirection)
 		{
-			move = newMoveDirection;
+            Move = newMoveDirection;
 		} 
 
 		public void LookInput(Vector2 newLookDirection)
 		{
-			look = newLookDirection;
+            Look = newLookDirection;
 		}
 
 		public void JumpInput(bool newJumpState)
 		{
-			jump = newJumpState;
-		}
-
-		public void SprintInput(bool newSprintState)
-		{
-			sprint = newSprintState;
+            Jump = newJumpState;
 		}
 
 		public void RightPunchInput(bool newRightPunchState)
 		{
-			rightPunch = newRightPunchState;
+            RightPunch = newRightPunchState;
 		}
 
 		public void LeftPunchInput(bool newLeftPunchState)
 		{
-			leftPunch = newLeftPunchState;
+            LeftPunch = newLeftPunchState;
 		}
 
-		public void BlockInput(bool newBlockState)
+        public void BlockInput(bool newBlockState)
         {
-			block = newBlockState;
+            Block = newBlockState;
         }
 
-		private void OnApplicationFocus(bool hasFocus)
+        public void AirRunInput(bool newAirRunState)
+        {
+            AirRun = newAirRunState;
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
 		{
 			SetCursorState(cursorLocked);
 		}
