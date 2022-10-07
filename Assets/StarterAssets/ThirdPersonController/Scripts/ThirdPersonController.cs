@@ -147,6 +147,7 @@ namespace StarterAssets
 
         private void Start()
         {
+            test.SetActive(false);
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
 
             _hasAnimator = TryGetComponent(out _animator);
@@ -179,7 +180,9 @@ namespace StarterAssets
             Attack();
         }
 
-        private int _airRunCount = 0; 
+        private int _airRunCount = 0;
+        [SerializeField]
+        private GameObject test;
         private void AirRun()
         {
             if (Grounded)
@@ -197,6 +200,7 @@ namespace StarterAssets
                 return;
             }
 
+            test.SetActive(true);
             _airRunCount++;
             if (_input.Move == Vector2.zero)
             {
@@ -209,6 +213,12 @@ namespace StarterAssets
                     transform.position + new Vector3(0, 5, 0),
                     0.5f
                 ).SetEase(Ease.OutCubic);
+                DOVirtual.DelayedCall(
+                    0.5f,
+                    () => {
+                        test.SetActive(false);
+                    }
+                );
                 return;
             }
 
@@ -222,6 +232,13 @@ namespace StarterAssets
                 transform.position + (moveVelocity * 5),
                 0.5f
             ).SetEase(Ease.OutCubic);
+
+            DOVirtual.DelayedCall(
+                    0.5f,
+                    () => {
+                        test.SetActive(false);
+                    }
+                );
 
             _input.AirRun = false;
         }
