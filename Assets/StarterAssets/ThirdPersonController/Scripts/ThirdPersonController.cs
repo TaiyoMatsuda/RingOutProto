@@ -1,7 +1,11 @@
 ﻿using DG.Tweening;
+using System;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
+using Random = UnityEngine.Random;
 #endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
@@ -102,6 +106,8 @@ namespace StarterAssets
         private int _animIDLeftPunch;
         private int _animIDRightPunch;
         private int _animIDBlock;
+        private int _animIDAirRun;
+        private int _animIDInAir;
 
 #if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
         private PlayerInput _playerInput;
@@ -179,10 +185,13 @@ namespace StarterAssets
             Attack();
         }
 
-        private int _airRunCount = 0; 
+        [SerializeField]
+        private GameObject _trail;
+        private int _airRunCount = 0;
+        private bool _endAirRun = true;
         private void AirRun()
         {
-            if (Grounded)
+            if (Grounded && _endAirRun)
             {
                 _airRunCount = 0;
             }
@@ -192,38 +201,81 @@ namespace StarterAssets
                 return;
             }
 
-            if (_airRunCount >= 1)
+            if (_airRunCount > 0)
             {
                 return;
             }
 
             _airRunCount++;
+            _endAirRun = false;
+            _animator.SetBool(_animIDAirRun, true);
+            _animator.SetBool(_animIDInAir, false);
+            _trail.SetActive(true);
             if (_input.Move == Vector2.zero)
             {
-                DOTween.To(
-                    () => _controller.transform.position,
-                    v => {
-                        Vector3 velocity = (v - transform.position) * Time.deltaTime;
-                        _controller.Move(velocity);
-                    },
-                    transform.position + new Vector3(0, 5, 0),
-                    0.5f
-                ).SetEase(Ease.OutCubic);
+                Run();
+                _input.AirRun = false;
                 return;
             }
 
-            Vector3 moveVelocity = _controller.velocity;
+            Run();
+            _input.AirRun = false;
+        }
+
+        private void Run()
+        {
+            Vector3 destination;
+            if (_input.Move == Vector2.zero)
+            {
+                destination = transform.position + new Vector3(0, 15, 0);
+            }
+            else
+            {
+                if (Grounded)
+                {
+                    Vector3 inputDirection = new Vector3(_input.Move.x, 0.0f, _input.Move.y).normalized;
+                    _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg +
+                                  _mainCamera.transform.eulerAngles.y;
+                    Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+
+                    _controller.Move(targetDirection.normalized * Time.deltaTime +
+                                     new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+                    destination = transform.position + (_controller.velocity * 12.0f);
+                }
+                else
+                {
+                    Vector3 toVec = new Vector3(_controller.velocity.x * 10, Math.Abs(_controller.velocity.y) * 2, _controller.velocity.z * 10);
+                    destination = transform.position + toVec;
+                }
+            }
+
             DOTween.To(
                 () => _controller.transform.position,
                 v => {
                     Vector3 velocity = (v - transform.position) * Time.deltaTime;
                     _controller.Move(velocity);
                 },
-                transform.position + (moveVelocity * 5),
+                destination,
                 0.5f
             ).SetEase(Ease.OutCubic);
 
-            _input.AirRun = false;
+            DOVirtual.DelayedCall(
+                0.5f,
+                () =>
+                {
+                    _endAirRun = true;
+                }
+            );
+
+            DOVirtual.DelayedCall(
+                0.4f,
+                () =>
+                {
+                    _animator.SetBool(_animIDAirRun, false);
+                    _animator.SetBool(_animIDInAir, true);
+                    _trail.SetActive(false);
+                }
+            );
         }
 
         private void LateUpdate()
@@ -241,6 +293,8 @@ namespace StarterAssets
             _animIDLeftPunch = Animator.StringToHash("LeftPunch");
             _animIDRightPunch = Animator.StringToHash("RightPunch");
             _animIDBlock = Animator.StringToHash("Block");
+            _animIDAirRun = Animator.StringToHash("AirRun");
+            _animIDInAir = Animator.StringToHash("InAir");
         }
 
         private void GroundedCheck()
@@ -332,12 +386,10 @@ namespace StarterAssets
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
 
-
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-
-            // move the player
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) +
-                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            var test = targetDirection.normalized * (_speed * Time.deltaTime) +
+                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
+            _controller.Move(test);
 
             // update animator if using character
             if (_hasAnimator)
@@ -351,6 +403,7 @@ namespace StarterAssets
         {
             if (Grounded)
             {
+                
                 jumpCount = 0;
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
@@ -365,7 +418,7 @@ namespace StarterAssets
                 // stop our velocity dropping infinitely when grounded
                 if (_verticalVelocity < 0.0f)
                 {
-                    _verticalVelocity = -2f;
+                    _verticalVelocity = -2.0f;
                 }
 
                 // Jump
@@ -425,6 +478,14 @@ namespace StarterAssets
             {
                 _animator.SetBool(_animIDJump, true);
             }
+
+            DOVirtual.DelayedCall(
+                0.1f,
+                () =>
+                {
+                    _animator.SetBool(_animIDInAir, true);
+                }
+            );
 
             jumpCount++;
         }
